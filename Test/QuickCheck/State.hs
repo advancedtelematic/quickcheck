@@ -33,7 +33,7 @@ data State
     -- dynamic
   , numSuccessTests           :: !Int
     -- ^ the current number of tests that have succeeded
-  , numFailedTests            :: !Int
+  , numFailedTests            :: Int
     -- ^ the current number of failed tests
   , numDiscardedTests         :: !Int
     -- ^ the current number of discarded tests
