@@ -407,7 +407,7 @@ runATest st f =
                               output = theOutput }
              else do
               testCase <- mapM showCounterexample (P.testCase res)
-              if S.maxFailedPercent st == 0 || numSuccessTests st == 0
+              if S.maxFailedPercent st == 0
               then return Failure{ usedSeed        = randomSeed st' -- correct! (this will be split first)
                                  , usedSize        = size
                                  , numTests        = numSuccessTests st'+1
