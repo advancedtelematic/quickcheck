@@ -86,10 +86,10 @@ data Args
 data Result
   -- | A successful test run
   = Success
-    { numTests     :: !Int
+    { numTests     :: Int
       -- ^ Number of tests performed
-    , numFailed    :: !Int
-    , numDiscarded :: !Int
+    , numFailed    :: Int
+    , numDiscarded :: Int
       -- ^ Number of tests skipped
     , labels       :: !(Map [String] Int)
       -- ^ The number of test cases having each combination of labels (see 'label')
@@ -266,9 +266,10 @@ test :: State -> Property -> IO Result
 test st f
   | numSuccessTests st   >= maxSuccessTests st && isNothing (coverageConfidence st) =
     doneTesting st f
-  | 100 * numFailedTests st >= maxFailedPercent st * maxSuccessTests st =
-    failedTesting st f
-  | numDiscardedTests st >= maxDiscardedRatio st * max (numSuccessTests st) (maxSuccessTests st) =
+  | 100 * numFailedTests st >= maxFailedPercent  st * max (numSuccessTests st) (maxSuccessTests st)
+  , numFailedTests st /= 0
+  = failedTesting st f
+  | numDiscardedTests    st >= maxDiscardedRatio st * max (numSuccessTests st) (maxSuccessTests st) =
     giveUp st f
   | otherwise =
     runATest st f
@@ -302,6 +303,7 @@ giveUp st _f =
        ( bold ("*** Gave up!")
       ++ " Passed only "
       ++ showTestCount st
+      ++ " tests"
        )
      success st
      theOutput <- terminalOutput (terminal st)
@@ -336,7 +338,7 @@ failedTesting st _f = do
 showTestCount :: State -> String
 showTestCount st =
      number (numSuccessTests st) "test"
-  ++ concat [ "test; " ++ show (numDiscardedTests st) ++ " discarded"
+  ++ concat [ "; " ++ show (numDiscardedTests st) ++ " discarded"
             | numDiscardedTests st > 0
             ]
   ++ concat [ "; " ++ show (numFailedTests st) ++ " failed (" ++
